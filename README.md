@@ -4,9 +4,8 @@ A self-hosted security dashboard that reads log files, spots suspicious
 patterns (like login attacks or port scans), and shows everything on a
 live dashboard.
 
-![Dashboard screenshot](docs/screenshots/dashboard-overview.png)
+<img width="1917" height="913" alt="image" src="https://github.com/user-attachments/assets/f377d34d-0f2b-496a-bfe0-84c973e63032" />
 
----
 
 ## What this actually does
 
@@ -63,7 +62,7 @@ What these do:
 
 ### Then open it
 
-Go to **http://localhost:8080** in your browser.
+
 
 Log in:
 | Username | Password | Can do |
