@@ -1,0 +1,21 @@
+[Unit]
+Description=SentinelView Log Shipper (%i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# %i is the instance name, e.g. `systemctl enable sentinelview-shipper@ssh_auth.service`
+# Adjust --file to point at the correct log for each instance.
+ExecStart=/usr/bin/python3 /opt/sentinelview/log-shipper-agent/shipper.py \
+    --file /var/log/auth.log \
+    --source-type %i \
+    --api-url http://localhost:8000/api/v1/events/push \
+    --api-key ${SENTINELVIEW_API_KEY}
+Restart=always
+RestartSec=5
+User=nobody
+EnvironmentFile=-/etc/sentinelview/shipper.env
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,44 @@
+# Example custom detection rule definitions.
+#
+# These are NOT auto-loaded by the app (rules live in the `detection_rules`
+# MySQL table, editable via the API/UI) -- this file is a reference for the
+# shape of a rule config, useful if you want to script bulk rule creation
+# with a small loader script that POSTs each entry to /api/v1/rules.
+
+rules:
+  - name: "Strict brute-force on admin panel"
+    description: "Tighter threshold for the internet-facing admin login."
+    rule_type: brute_force
+    mitre_technique_id: T1110
+    mitre_technique_name: "Brute Force"
+    severity: critical
+    weight: 3
+    enabled: true
+    config:
+      window_seconds: 60
+      threshold: 3
+      event_types: ["auth_failure"]
+
+  - name: "Off-hours privileged command usage"
+    description: "Flags any sudo/su usage outside business hours (custom generic threshold rule)."
+    rule_type: priv_escalation
+    mitre_technique_id: T1548
+    mitre_technique_name: "Abuse Elevation Control Mechanism"
+    severity: medium
+    weight: 2
+    enabled: true
+    config:
+      window_seconds: 3600
+      threshold: 1
+
+  - name: "Aggressive port scan"
+    description: "Lower threshold / shorter window than the built-in port scan rule, for a tighter perimeter."
+    rule_type: port_scan
+    mitre_technique_id: T1046
+    mitre_technique_name: "Network Service Discovery"
+    severity: high
+    weight: 3
+    enabled: true
+    config:
+      window_seconds: 30
+      distinct_ports_threshold: 6
