@@ -14,17 +14,9 @@ mapped to MITRE ATT&CK, and surfaces the results on a live analyst dashboard.
 
 | Component | URL |
 |---|---|
-| **Dashboard (frontend)** | `https://sentinel-view-enterprise-siem-threat-detection-platform.vercel.app` |
-| **API (backend)** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com` |
+| **Dashboard** | `https://sentinelview-console.vercel.app/` |
 | **API Docs (Swagger UI)** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs` |
 
-> Replace the URLs above with your own deployment's actual addresses if they differ.
-
-The backend runs on a free-tier instance and may take **30–60 seconds** to
-respond on the first request after a period of inactivity ("cold start").
-This is expected — refresh once if the first load seems slow.
-
----
 
 ## Accessing the Platform
 
@@ -93,8 +85,6 @@ page (Admin's own login token required, obtained by logging in through
 5. **Reports**, exporting any alert or time range as a CSV or formatted
    PDF incident report.
 
----
-
 ## Tech Stack
 
 - **Backend:** Python, FastAPI, SQLAlchemy
@@ -104,9 +94,7 @@ page (Admin's own login token required, obtained by logging in through
 - **Auth:** JWT with role-based access control (RBAC)
 - **Deployment:** Render (backend + Redis), Vercel (frontend), Aiven (MySQL)
 - **Containerization:** Docker + Docker Compose (for local development)
-
----
-
+  
 ## Project Structure
 
 ```
@@ -131,8 +119,6 @@ sentinelview/
 └── docs/                       Additional documentation
 ```
 
----
-
 ## Running Locally
 
 Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
@@ -156,8 +142,6 @@ Open **http://localhost:8080**. Demo accounts created by the seed script
 Full step-by-step explanation (written for beginners, no assumed
 knowledge) is in `GETTING_STARTED_SIMPLE.md`.
 
----
-
 ## How Detection Works
 
 Every alert traces back to a specific rule stored in the database — there
@@ -174,13 +158,3 @@ no code change required.
 | Privilege Escalation Pattern | T1548 | Spike in sudo/su usage from one account |
 | Web Attack Signature | T1190 | SQL injection / XSS patterns in request paths |
 
----
-
-## Security Notes
-
-- Change `JWT_SECRET_KEY` and `INGEST_API_KEY` before any real-world use
-- Demo account passwords are intentionally weak and public in this README
-  — rotate or delete them before treating this as anything beyond a demo
-- The `/events/push` ingestion endpoint uses a shared API key (not a user
-  JWT), since it's meant for machine-to-machine traffic from the
-  log-shipper agent — treat that key as a secret
