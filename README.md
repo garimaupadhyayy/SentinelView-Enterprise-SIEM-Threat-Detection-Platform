@@ -1,121 +1,187 @@
 # SentinelView
 
-A self-hosted security dashboard that reads log files, spots suspicious
-patterns (like login attacks or port scans), and shows everything on a
-live dashboard.
+**Enterprise Security Information and Event Management (SIEM)**
 
-<img width="1917" height="913" alt="image" src="https://github.com/user-attachments/assets/f377d34d-0f2b-496a-bfe0-84c973e63032" />
+A self-hosted log aggregation and threat correlation platform. SentinelView
+ingests security logs (SSH auth, web access, firewall), normalizes them into
+a unified schema, evaluates them against a rule-based correlation engine
+mapped to MITRE ATT&CK, and surfaces the results on a live analyst dashboard.
 
-
-## What this actually does
-
-1. You feed it log files (or it reads them live from a server)
-2. It cleans up the messy log text into organized data
-3. It checks that data against a set of rules ("5 failed logins from the
-   same IP in 5 minutes = alert")
-4. It shows you the results — charts, a map, and a list of alerts you can
-   investigate
+![Dashboard screenshot](docs/screenshots/dashboard-overview.png)
 
 ---
 
-## Project structure (kept simple)
+## Live Deployment
+
+| Component | URL |
+|---|---|
+| **Dashboard (frontend)** | `https://sentinel-view-enterprise-siem-threat-detection-platform.vercel.app` |
+| **API (backend)** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com` |
+| **API Docs (Swagger UI)** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs` |
+
+> Replace the URLs above with your own deployment's actual addresses if they differ.
+
+The backend runs on a free-tier instance and may take **30–60 seconds** to
+respond on the first request after a period of inactivity ("cold start").
+This is expected — refresh once if the first load seems slow.
+
+---
+
+## Accessing the Platform
+
+### For the project owner (Admin)
+
+The Admin account is created automatically — **the first person to ever
+register on a fresh deployment becomes Admin.** All subsequent registrations
+default to Viewer.
+
+### For anyone else you want to give access (Viewer / Analyst)
+
+There is no self-serve "sign up" button on the login page by design (SIEM
+tools are internal security software, not public products). To grant
+someone access:
+
+1. Go to the API docs: `<backend-url>/docs`
+2. Expand **POST `/api/v1/auth/register`**
+3. Click **"Try it out"**
+4. Fill in the request body:
+   ```json
+   {
+     "username": "their_username",
+     "email": "their_email@example.com",
+     "password": "a_strong_password",
+     "role": "viewer"
+   }
+   ```
+5. Click **Execute** — a `201` response confirms the account was created
+6. Share the username and password with them directly (outside this system)
+
+They can then log in at the frontend URL's `/login` page.
+
+**Role reference:**
+
+| Role | Can view dashboard, alerts, logs | Can change alert status | Can manage detection rules | Can manage users |
+|---|---|---|---|---|
+| Viewer | Yes | No | No | No |
+| Analyst | Yes | Yes | No | No |
+| Admin | Yes | Yes | Yes | Yes |
+
+Only an **Admin** can promote a Viewer/Analyst to a different role — this is
+done via the `PATCH /api/v1/auth/users/{id}` endpoint in the same API docs
+page (Admin's own login token required, obtained by logging in through
+`/auth/login` in the same docs page first).
+
+> Roles are enforced on the backend, not just hidden in the UI — a Viewer
+> account cannot perform Analyst/Admin actions even by calling the API
+> directly.
+
+---
+
+## What It Does
+
+1. **Ingests** logs via file upload or a REST push endpoint, using
+   dedicated parsers for SSH auth logs, web server access logs, and
+   firewall/iptables logs — each normalized into one unified event schema.
+2. **Correlates** every incoming event against a set of configurable,
+   database-stored detection rules (brute-force login, port scanning,
+   impossible travel, privilege escalation, web attack signatures).
+3. **Alerts**, with each one mapped to a real MITRE ATT&CK technique ID,
+   scored by severity, and deduplicated via Redis so a single ongoing
+   attack doesn't flood the queue with duplicate alerts.
+4. **Displays** everything on a live dashboard: event volume over time,
+   geo-distribution of source IPs, MITRE ATT&CK coverage heatmap, and a
+   real-time event tail over WebSocket.
+5. **Reports**, exporting any alert or time range as a CSV or formatted
+   PDF incident report.
+
+---
+
+## Tech Stack
+
+- **Backend:** Python, FastAPI, SQLAlchemy
+- **Frontend:** React, TypeScript, Tailwind CSS, Recharts
+- **Database:** MySQL (hosted on Aiven)
+- **Cache / dedup:** Redis
+- **Auth:** JWT with role-based access control (RBAC)
+- **Deployment:** Render (backend + Redis), Vercel (frontend), Aiven (MySQL)
+- **Containerization:** Docker + Docker Compose (for local development)
+
+---
+
+## Project Structure
 
 ```
 sentinelview/
-├── backend/              The "brain" — Python program that reads logs,
-│                         detects attacks, and stores everything
+├── backend/                 FastAPI application
+│   └── app/
+│       ├── api/             Route handlers (auth, events, alerts, rules, ...)
+│       ├── core/            Config, DB session, security/JWT, RBAC
+│       ├── models/          SQLAlchemy models
+│       ├── parsers/         SSH / web access / firewall log parsers
+│       ├── services/        Correlation engine, alert service, ingestion
+│       └── ws/               WebSocket connection manager
 │
-├── frontend/             The website you see in your browser
+├── frontend/                 React + TypeScript dashboard
+│   └── src/
+│       ├── pages/            One file per screen
+│       ├── components/       Reusable UI pieces
+│       └── api/               Backend API client
 │
-├── log-shipper-agent/    A small optional script for pulling logs from
-│                         a real server (not needed for local testing)
-│
-└── docker-compose.yml    One file that starts everything with one command
+├── log-shipper-agent/         Lightweight agent for streaming real server logs
+├── docker-compose.yml         One-command local deployment
+└── docs/                       Additional documentation
 ```
-
-That's genuinely it at a glance. Inside `backend/` and `frontend/` things
-are split into smaller folders (parsers, pages, components, etc.) but you
-don't need to touch those to just *run* the project.
 
 ---
 
-## How to access it (local setup)
+## Running Locally
 
-### Requirements
-- **Docker Desktop** installed and running (download from docker.com)
-- **VS Code** (or just a terminal — VS Code isn't required, just convenient)
-
-### First time only
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
+git clone <this-repo>
 cd sentinelview
 docker compose up --build -d
-docker compose --profile demo run --rm seed
+docker compose --profile demo run --rm seed   # loads demo data
 ```
 
-What these do:
-- `docker compose up --build -d` — builds and starts the database,
-  cache, backend, and frontend, all together
-- `docker compose --profile demo run --rm seed` — fills the empty
-  database with realistic sample logs and a few fake attacks, so the
-  dashboard isn't empty
+Open **http://localhost:8080**. Demo accounts created by the seed script
+(password `ChangeMe123!` for all — change before any real deployment):
 
-### Then open it
-
-
-
-Log in:
-| Username | Password | Can do |
-|---|---|---|
-| `admin` | `ChangeMe123!` | Everything |
-| `analyst` | `ChangeMe123!` | View + manage alerts |
-| `viewer` | `ChangeMe123!` | View only |
-
-### Every time after that
-
-You don't need to repeat the setup. Just:
-
-```bash
-docker compose up -d
-```
-
-Then open **http://localhost:8080** again — your data from before is
-still there.
-
-### When you're done
-
-```bash
-docker compose down
-```
-
-This turns everything off but keeps your data safe for next time.
-
----
-
-## Testing it yourself
-
-Want to see an alert get created live? Upload a log file from the
-**Overview** page ("Ingest Log File" box). A ready-made fake attack log
-is available on request — or make your own following the format shown
-under each source type.
-
----
-
-## Quick command reference
-
-| I want to... | Run this |
+| Username | Role |
 |---|---|
-| Start everything (first time) | `docker compose up --build -d` |
-| Start everything (normal use) | `docker compose up -d` |
-| Load demo data | `docker compose --profile demo run --rm seed` |
-| Check what's running | `docker compose ps` |
-| Stop everything | `docker compose down` |
-| See live backend activity | `docker compose logs -f backend` |
+| `admin` | Admin |
+| `analyst` | Analyst |
+| `viewer` | Viewer |
+
+Full step-by-step explanation (written for beginners, no assumed
+knowledge) is in `GETTING_STARTED_SIMPLE.md`.
 
 ---
 
-## Want more detail?
+## How Detection Works
 
-See `GETTING_STARTED_SIMPLE.md` in this same folder for a longer,
-plain-language walkthrough of every folder, every term (Docker, MySQL,
-Redis, API, JWT...), and how the detection engine actually works.
+Every alert traces back to a specific rule stored in the database — there
+is no ML, no black box. Each rule defines a `rule_type` (which detection
+logic runs), a time window, and a threshold. New rule instances are
+created via the **Detection Rules** page in the dashboard (Admin only) —
+no code change required.
+
+| Rule | MITRE ATT&CK | Detects |
+|---|---|---|
+| Brute Force Login Detection | T1110 | N failed logins from one IP in a rolling window |
+| Port Scan Detection | T1046 | One IP touching many distinct ports quickly |
+| Impossible Travel | T1078 | Same user logging in from two geo-distant IPs too fast |
+| Privilege Escalation Pattern | T1548 | Spike in sudo/su usage from one account |
+| Web Attack Signature | T1190 | SQL injection / XSS patterns in request paths |
+
+---
+
+## Security Notes
+
+- Change `JWT_SECRET_KEY` and `INGEST_API_KEY` before any real-world use
+- Demo account passwords are intentionally weak and public in this README
+  — rotate or delete them before treating this as anything beyond a demo
+- The `/events/push` ingestion endpoint uses a shared API key (not a user
+  JWT), since it's meant for machine-to-machine traffic from the
+  log-shipper agent — treat that key as a secret
