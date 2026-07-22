@@ -3,7 +3,7 @@ import json
 import httpx
 
 from app.core.config import settings
-from app.core.redis_client import redis_client
+from app.core.redis_client import redis_safe_get, redis_safe_setex
 
 THREAT_INTEL_CACHE_PREFIX = "threatintel:"
 THREAT_INTEL_CACHE_TTL_SECONDS = 60 * 60 * 6
@@ -20,7 +20,7 @@ def check_ip_reputation(ip: str) -> dict | None:
         return None
 
     cache_key = f"{THREAT_INTEL_CACHE_PREFIX}{ip}"
-    cached = redis_client.get(cache_key)
+    cached = redis_safe_get(cache_key)
     if cached:
         return json.loads(cached)
 
@@ -38,7 +38,7 @@ def check_ip_reputation(ip: str) -> dict | None:
             "is_known_malicious": (data.get("abuseConfidenceScore") or 0) >= 50,
             "country_code": data.get("countryCode"),
         }
-        redis_client.setex(cache_key, THREAT_INTEL_CACHE_TTL_SECONDS, json.dumps(result))
+        redis_safe_setex(cache_key, THREAT_INTEL_CACHE_TTL_SECONDS, json.dumps(result))
         return result
     except (httpx.HTTPError, ValueError, KeyError):
         return None

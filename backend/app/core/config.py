@@ -42,6 +42,13 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
+    REDIS_PASSWORD: str = ""
+    REDIS_SSL: bool = False
+    # If set, this takes priority over the individual REDIS_* fields above.
+    # Managed providers (Render, Upstash, Aiven, etc.) usually give you a
+    # single ready-to-use URL like redis://user:pass@host:port or
+    # rediss://... (the extra 's' means TLS/SSL) instead of separate parts.
+    REDIS_URL: str = ""
 
     # --- CORS ---
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]

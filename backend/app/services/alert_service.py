@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.redis_client import redis_client
+from app.core.redis_client import redis_safe_expire, redis_safe_get, redis_safe_setex
 from app.models.alert import Alert, AlertStatus
 from app.models.event import Severity
 from app.models.rule import DetectionRule
@@ -63,7 +63,7 @@ class AlertService:
         occurrence_count: int = 1,
     ) -> Alert:
         dedup_key = _dedup_key(rule.name, source_ip, target)
-        cache_hit = redis_client.get(dedup_key)
+        cache_hit = redis_safe_get(dedup_key)
 
         severity = score_severity(rule.severity, rule.weight, occurrence_count)
         now = datetime.now(timezone.utc)
@@ -85,7 +85,7 @@ class AlertService:
                 alert.related_event_ids = ",".join(sorted(existing_ids, key=int))
                 self.db.commit()
                 self.db.refresh(alert)
-                redis_client.expire(dedup_key, settings.ALERT_DEDUP_WINDOW_SECONDS)
+                redis_safe_expire(dedup_key, settings.ALERT_DEDUP_WINDOW_SECONDS)
                 return alert
 
         alert = Alert(
@@ -109,7 +109,7 @@ class AlertService:
         self.db.commit()
         self.db.refresh(alert)
 
-        redis_client.setex(dedup_key, settings.ALERT_DEDUP_WINDOW_SECONDS, alert.id)
+        redis_safe_setex(dedup_key, settings.ALERT_DEDUP_WINDOW_SECONDS, alert.id)
 
         if severity == Severity.CRITICAL:
             dispatch_critical_notification(alert)

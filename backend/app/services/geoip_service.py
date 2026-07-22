@@ -5,7 +5,7 @@ import math
 import httpx
 
 from app.core.config import settings
-from app.core.redis_client import redis_client
+from app.core.redis_client import redis_safe_get, redis_safe_setex
 
 GEOIP_CACHE_PREFIX = "geoip:"
 GEOIP_CACHE_TTL_SECONDS = 60 * 60 * 24  # 24h, IP geolocation doesn't need to be fresh
@@ -28,7 +28,7 @@ def lookup_ip(ip: str) -> dict | None:
         return None
 
     cache_key = f"{GEOIP_CACHE_PREFIX}{ip}"
-    cached = redis_client.get(cache_key)
+    cached = redis_safe_get(cache_key)
     if cached:
         return json.loads(cached)
 
@@ -44,7 +44,7 @@ def lookup_ip(ip: str) -> dict | None:
                 "city": data.get("city"),
                 "isp": data.get("isp"),
             }
-            redis_client.setex(cache_key, GEOIP_CACHE_TTL_SECONDS, json.dumps(result))
+            redis_safe_setex(cache_key, GEOIP_CACHE_TTL_SECONDS, json.dumps(result))
             return result
     except (httpx.HTTPError, ValueError, KeyError):
         pass
