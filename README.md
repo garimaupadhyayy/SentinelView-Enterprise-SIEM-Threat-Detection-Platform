@@ -62,11 +62,6 @@ done via the `PATCH /api/v1/auth/users/{id}` endpoint in the same API docs
 page (Admin's own login token required, obtained by logging in through
 `/auth/login` in the same docs page first).
 
-> Roles are enforced on the backend, not just hidden in the UI — a Viewer
-> account cannot perform Analyst/Admin actions even by calling the API
-> directly.
-
----
 
 ## What It Does
 
