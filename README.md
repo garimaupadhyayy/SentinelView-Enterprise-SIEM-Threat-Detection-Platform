@@ -7,9 +7,8 @@ ingests security logs (SSH auth, web access, firewall), normalizes them into
 a unified schema, evaluates them against a rule-based correlation engine
 mapped to MITRE ATT&CK, and surfaces the results on a live analyst dashboard.
 
-![Dashboard screenshot](docs/screenshots/dashboard-overview.png)
+<img width="1916" height="902" alt="image" src="https://github.com/user-attachments/assets/207fc315-98a1-4b93-8af9-3a6415a88aa3" />
 
----
 
 ## Live Deployment
 
