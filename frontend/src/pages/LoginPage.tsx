@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Radar, ArrowRight, AlertCircle } from "lucide-react";
+import { Shield, ArrowRight, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
@@ -29,12 +29,17 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-scan pointer-events-none" />
       <div className="w-full max-w-sm relative">
-        <div className="flex items-center gap-2.5 justify-center mb-8">
-          <Radar className="h-8 w-8 text-signal" strokeWidth={2.2} />
-          <span className="font-display font-semibold text-2xl tracking-tight">
-            Sentinel<span className="text-signal">View</span>
-          </span>
-        </div>
+       <div className="flex flex-col items-center text-center mb-8">
+  <div className="flex items-center gap-2.5">
+    <Shield className="h-8 w-8 text-signal" strokeWidth={2.2} />
+    <span className="font-display font-semibold text-2xl tracking-tight">
+      Sentinel<span className="text-signal">View</span>
+    </span>
+  </div>
+  <p className="mt-2 text-xs text-ink-muted">
+    Enterprise Security Information and Event Management
+  </p>
+</div>
 
         <form onSubmit={handleSubmit} className="panel p-6 space-y-4">
           <div>
