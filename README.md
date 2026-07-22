@@ -1,4 +1,4 @@
-# SentinelView
+# SentinelView 🛡️
 
 **Enterprise Security Information and Event Management (SIEM)**
 
