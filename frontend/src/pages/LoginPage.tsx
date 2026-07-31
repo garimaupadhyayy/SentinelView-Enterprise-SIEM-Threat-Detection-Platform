@@ -83,11 +83,6 @@ export function LoginPage() {
             {submitting ? "Signing in…" : "Sign in"}
             {!submitting && <ArrowRight className="h-4 w-4" />}
           </button>
-
-          <p className="text-xs text-ink-faint text-center pt-2">
-            Demo credentials (after seeding): admin / analyst / viewer — password{" "}
-            <span className="font-mono">ChangeMe123!</span>
-          </p>
         </form>
       </div>
     </div>
