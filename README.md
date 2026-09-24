@@ -253,15 +253,15 @@ Architecture
                          └────────────┘ └───────────┘
 Tech Stack
 Layer	Technologies
-Backend	Python, FastAPI, SQLAlchemy
-Frontend	React, TypeScript, Tailwind CSS, Recharts
-Database	MySQL
-Cache / Deduplication	Redis
-Authentication	JWT
-Authorization	Role-Based Access Control (RBAC)
-Communication	REST API, WebSockets
-Deployment	Render, Vercel, Aiven
-Containerization	Docker, Docker Compose
+Backend= Python, FastAPI, SQLAlchemy
+Frontend= React, TypeScript, Tailwind CSS, Recharts
+Database= MySQL
+Cache / Deduplication= Redis
+Authentication= JWT
+Authorization = Role-Based Access Control (RBAC)
+Communication = REST API, WebSockets
+Deployment= Render, Vercel, Aiven
+Containerization = Docker, Docker Compose
 Project Structure
 sentinelview/
 │
@@ -316,10 +316,8 @@ This loads the local demonstration dataset and creates the configured demo accou
 http://localhost:8080
 
 For additional beginner-friendly setup instructions, see:
-
 GETTING_STARTED_SIMPLE.md
 Demo Accounts
-
 The demo seed creates accounts for the available RBAC roles:
 
 Account	Role
@@ -334,18 +332,13 @@ Never commit real passwords, API keys, JWT secrets, database credentials, or oth
 User & Role Management
 Admin Account
 
-On a fresh deployment, the first person to register becomes the Admin automatically.
-
-Subsequent registrations default to the Viewer role.
-
+On a fresh deployment, the first person to register becomes the Admin automatically. Subsequent registrations default to the Viewer role.
 Registering a User
-
 Open the Swagger documentation:
 
 https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
 
 Use:
-
 POST /api/v1/auth/register
 
 Example structure:
@@ -357,134 +350,5 @@ Example structure:
   "role": "analyst"
 }
 
-Use your own secure credentials when running the application. Do not publish real credentials in the README.
 
-Changing User Roles
-
-Only an Admin can change another user's role.
-
-Authentication:
-
-POST /api/v1/auth/login
-
-Role management:
-
-PATCH /api/v1/auth/users/{id}
-
-Supported roles:
-
-viewer
-analyst
-admin
-API Reference
-
-Complete API documentation is available through Swagger UI:
-
-https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
-Key Endpoints
-Method	Endpoint	Purpose
-POST	/api/v1/auth/register	Register a user
-POST	/api/v1/auth/login	Authenticate and obtain JWT
-PATCH	/api/v1/auth/users/{id}	Admin role management
-WS	WebSocket endpoint	Real-time security-event updates
-
-Additional APIs cover:
-
-Security-event ingestion
-Alerts
-Detection rules
-Security logs
-Reporting
-Dashboard data
-
-Refer to Swagger for the complete API specification.
-
-Security Configuration
-
-Before using SentinelView outside a local demonstration environment, configure secure environment-specific values.
-
-JWT Secret
-
-Configure:
-
-JWT_SECRET_KEY
-
-Use a strong, randomly generated secret.
-
-Ingestion API Key
-
-Configure:
-
-INGEST_API_KEY
-
-The ingestion endpoint uses an API key for machine-to-machine communication from the log-shipper agent.
-
-Environment Variables
-
-Never commit:
-
-.env
-
-files containing secrets.
-
-Keep the following environment-specific:
-
-Database credentials
-JWT secrets
-Ingestion API keys
-External service credentials
-Security & Privacy Considerations
-
-SentinelView demonstrates controlled handling of security data through:
-
-PII masking before storage
-JWT authentication
-Backend-enforced RBAC
-Role-based administrative controls
-Security-event normalization
-Severity-based alerting
-API-key protected machine-to-machine ingestion
-Centralized security monitoring
-Incident-oriented reporting
-
-The project is intended as a cybersecurity learning and portfolio project. Additional security hardening and deployment controls should be applied before production use.
-
-Security Design Principles
-Least-Privilege Access
-
-Platform capabilities are separated according to user roles.
-
-Sensitive Data Protection
-
-Applicable PII is masked before security events are stored.
-
-Centralized Visibility
-
-Security events from multiple sources are normalized and presented through a single monitoring interface.
-
-Traceable Detection
-
-Alerts are associated with specific detection rules and MITRE ATT&CK techniques.
-
-Controlled Ingestion
-
-Machine-to-machine ingestion is protected using an API key.
-
-Security Reporting
-
-Detected activity can be exported for investigation and documentation.
-
-Future Scope
-
-The following are planned or potential future extensions and are not currently represented as implemented features:
-
-Data classification capabilities
-Data Loss Prevention (DLP) integrations
-Cloud security log integrations
-Additional threat-intelligence sources
-Machine-learning-based anomaly detection
-Expanded data-governance capabilities
-Additional privacy controls
-Multi-tenant security monitoring
-Advanced sensitive-data discovery
 Extended security analytics
