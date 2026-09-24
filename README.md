@@ -101,8 +101,6 @@ The platform:
 - Masks sensitive information
 - Reduces exposure of sensitive information in stored logs
 
-No real credentials, API keys, JWT secrets, or environment-specific secrets are included in the repository.
-
 ---
 
 ## 4. Authentication & Role-Based Access Control
@@ -350,5 +348,3 @@ Example structure:
   "role": "analyst"
 }
 
-
-Extended security analytics
