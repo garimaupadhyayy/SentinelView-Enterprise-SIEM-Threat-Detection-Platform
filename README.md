@@ -351,3 +351,4 @@ Example structure:
 }
 
 SentinelView — Turning Security Events into Actionable Insights.
+~Garima Upadhyay
