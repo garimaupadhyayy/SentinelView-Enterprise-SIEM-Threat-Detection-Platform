@@ -79,18 +79,6 @@ SSH / Web / Firewall Logs
  CSV / PDF Incident Reports
 ```
 
-Open **http://localhost:8080**. Demo accounts created by the seed script
-(password `ChangeMe123!` for all — change before any real deployment):
-
-| Username | Role |
-|---|---|
-| `admin` | Admin |
-| `analyst` | Analyst |
-| `viewer` | Viewer |
-
-Full step-by-step explanation (written for beginners, no assumed
-knowledge) is in `GETTING_STARTED_SIMPLE.md`.
-
 ## How Detection Works
 
 Every alert traces back to a specific rule stored in the database — there
