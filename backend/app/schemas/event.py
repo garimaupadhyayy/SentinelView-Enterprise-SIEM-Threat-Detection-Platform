@@ -3,8 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.event import Severity, SourceType
-
+from app.models.event import Classification, Severity, SourceType
 
 class NormalizedEventIn(BaseModel):
     """The unified schema every parser and the REST push endpoint produce."""
@@ -20,6 +19,7 @@ class NormalizedEventIn(BaseModel):
     status_code: Optional[str] = None
     port: Optional[int] = None
     url_path: Optional[str] = None
+    classification: Classification = Classification.PUBLIC
 
 
 class EventOut(NormalizedEventIn):
