@@ -16,8 +16,6 @@ SentinelView is a self-hosted SIEM platform designed to centralize security moni
 - Real-time security monitoring through WebSockets
 - CSV and PDF incident reporting
 
-<img width="1916" height="906" alt="SentinelView Dashboard" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
-
 ## Live Deployment
 
 | Component | URL |
