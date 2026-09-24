@@ -2,17 +2,30 @@
 
 ## Enterprise Security Information and Event Management (SIEM)
 
-SentinelView is a self-hosted SIEM platform designed to centralize security monitoring, normalize heterogeneous security logs, detect threats, protect sensitive information, and support analyst-driven incident investigation. The platform ingests SSH authentication, web access, and firewall logs, converts them into a unified event schema, evaluates them through configurable MITRE ATT&CK-mapped detection rules, and presents security events through a real-time analyst dashboard.
-
-<img width="1916" height="906" alt="image" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
-
-## Overview
-
-SentinelView is a self-hosted SIEM platform designed to centralize security monitoring, normalize heterogeneous security logs, detect suspicious activity, protect sensitive information, and support analyst-driven incident investigation.
+SentinelView is a self-hosted SIEM platform designed to centralize security monitoring, normalize heterogeneous security logs, detect threats, protect sensitive information, and support analyst-driven incident investigation.
 
 The platform ingests SSH authentication, web access, and firewall logs, converts them into a unified event schema, evaluates events through configurable MITRE ATT&CK-mapped detection rules, and presents security activity through a real-time analyst dashboard.
 
-<br>
+<img width="1916" height="906" alt="image" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
+
+---
+
+## Overview
+
+SentinelView provides centralized visibility across multiple security log sources through a unified monitoring platform.
+
+The system combines:
+
+- Security log ingestion and normalization
+- Rule-based threat detection
+- MITRE ATT&CK mapping
+- PII masking
+- JWT authentication and RBAC
+- Redis-based alert deduplication
+- Real-time security monitoring
+- Incident reporting
+
+---
 
 ## Key Highlights
 
@@ -21,12 +34,12 @@ The platform ingests SSH authentication, web access, and firewall logs, converts
 - **PII masking** using regex and Luhn validation
 - JWT-based **Role-Based Access Control (RBAC)**
 - Redis-based alert deduplication
-- Real-time security monitoring through WebSockets
+- Real-time monitoring through WebSockets
 - CSV and PDF incident reporting
-- Configurable database-backed detection rules
-- Live MITRE ATT&CK coverage visualization
+- Database-backed configurable detection rules
+- MITRE ATT&CK coverage visualization
 
-<br>
+---
 
 ## Live Deployment
 
@@ -35,38 +48,52 @@ The platform ingests SSH authentication, web access, and firewall logs, converts
 | **Dashboard** | `https://sentinelview-console.vercel.app/` |
 | **API Documentation** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs` |
 
-> The backend runs on a free-tier instance and may take 30–60 seconds to respond after a period of inactivity due to cold starts.
+---
 
-<br>
+# Core Features
 
-## Core Features
+## 1. Centralized Security Monitoring
 
-### Centralized Security Monitoring
+SentinelView brings multiple security data sources into a single monitoring platform.
 
-SentinelView brings multiple security data sources into one monitoring platform.
+### Supported Sources
 
 - SSH authentication logs
 - Web server access logs
 - Firewall / iptables logs
+
+### Ingestion Methods
+
 - File-based log ingestion
 - REST-based log ingestion
-- Unified security-event schema
 - Real-time event visibility
 
-### Threat Detection & Correlation
+All supported logs are parsed and converted into a common security-event schema before detection.
 
-The platform uses a rule-based detection engine to identify suspicious activity.
+---
+
+## 2. Threat Detection & Correlation
+
+SentinelView uses a rule-based detection engine to identify suspicious activity.
+
+The detection engine supports:
 
 - Database-stored detection rules
 - Configurable thresholds
 - Configurable time windows
 - Severity-based alerts
-- MITRE ATT&CK mapping
+- MITRE ATT&CK technique mapping
 - Redis-based alert deduplication
 
-### Sensitive Data Protection
+The current implementation uses deterministic rule-based detection rather than ML-based or black-box classification.
+
+---
+
+## 3. Sensitive Data Protection
 
 SentinelView includes a data-protection layer for security events.
+
+The platform:
 
 - Detects applicable PII before storage
 - Uses regex-based detection
@@ -74,116 +101,67 @@ SentinelView includes a data-protection layer for security events.
 - Masks sensitive information
 - Reduces exposure of sensitive information in stored logs
 
-### Access Control
+No real credentials, API keys, JWT secrets, or environment-specific secrets are included in the repository.
 
-SentinelView uses JWT authentication and Role-Based Access Control.
+---
+
+## 4. Authentication & Role-Based Access Control
+
+SentinelView uses JWT authentication with backend-enforced Role-Based Access Control.
 
 | Role | Dashboard / Alerts / Logs | Change Alert Status | Manage Detection Rules | Manage Users |
 |---|---|---|---|---|
-| Viewer | Yes | No | No | No |
-| Analyst | Yes | Yes | No | No |
-| Admin | Yes | Yes | Yes | Yes |
+| **Viewer** | Yes | No | No | No |
+| **Analyst** | Yes | Yes | No | No |
+| **Admin** | Yes | Yes | Yes | Yes |
 
-<br>
+Roles are enforced at the backend API level and are not limited to frontend visibility.
 
-## Creating Users & Roles
+---
 
-### Admin Account
-
-On a **fresh deployment**, the first person to register becomes the **Admin** automatically.
-
-All subsequent registrations default to the **Viewer** role.
-
-### Creating a Viewer / Analyst
-
-To create another user:
-
-1. Open the backend Swagger documentation:
-
-```text
-https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
-Expand:
-POST /api/v1/auth/register
-Click Try it out.
-Provide the required user details.
-
-Example:
-
-{
-  "username": "analyst_user",
-  "email": "analyst@example.com",
-  "password": "strong_password",
-  "role": "analyst"
-}
-Click Execute.
-
-A successful response confirms that the account has been created.
-
-The user can then log in through the frontend dashboard.
-
-Changing User Roles
-
-Only an Admin can promote or change another user's role.
-
-Use:
-
-PATCH /api/v1/auth/users/{id}
-
-The Admin's authentication token is required.
-
-The Admin first authenticates through:
-
-POST /api/v1/auth/login
-
-and uses the returned JWT token for authorized administrative operations.
-
-Supported roles:
-
-viewer
-analyst
-admin
-
-Roles are enforced on the backend, not only through frontend visibility. A Viewer cannot perform Analyst/Admin operations by directly calling protected APIs.
-
-<br>
-Security Dashboard
+# Security Dashboard
 
 The dashboard provides centralized visibility into:
 
-Event volume over time
-Security alerts
-Source IP distribution
-Geographic distribution
-MITRE ATT&CK coverage
-Real-time event streams
-Alert status
+- Event volume over time
+- Security alerts
+- Source IP distribution
+- Geographic distribution
+- MITRE ATT&CK coverage
+- Real-time event streams
+- Alert status
 
-Real-time events are delivered through WebSockets.
+Real-time security events are delivered through WebSockets.
 
-<br>
-Detection Rules
+---
 
-Every alert traces back to a specific rule stored in the database.
+# Detection Rules
 
-Each rule defines:
+Every generated alert is associated with a specific detection rule stored in the database.
 
-Detection type
-Threshold
-Time window
+Each rule can define:
 
-Current detection rules include:
+- Detection type
+- Threshold
+- Time window
 
-Detection Rule	MITRE ATT&CK	Detects
-Brute Force Login Detection	T1110	Repeated failed login attempts
-Port Scan Detection	T1046	Rapid access to multiple ports
-Impossible Travel	T1078	Abnormal login locations
-Privilege Escalation Pattern	T1548	Suspicious sudo/su activity
-Web Attack Signature	T1190	SQL injection / XSS patterns
+## Current Detection Rules
 
-New rule instances can be configured through the Detection Rules page without changing the detection-engine source code.
+| Detection Rule | MITRE ATT&CK | Detects |
+|---|---|---|
+| **Brute Force Login Detection** | T1110 | Repeated failed login attempts |
+| **Port Scan Detection** | T1046 | Rapid access to multiple ports |
+| **Impossible Travel** | T1078 | Abnormal login locations |
+| **Privilege Escalation Pattern** | T1548 | Suspicious sudo/su activity |
+| **Web Attack Signature** | T1190 | SQL injection / XSS patterns |
 
-<br>
-Detection Workflow
+New rule instances can be configured through the Detection Rules interface without modifying the core detection-engine source code.
+
+---
+
+# Detection Workflow
+
+```text
 SSH / Web / Firewall Logs
           ↓
      Log Ingestion
@@ -194,7 +172,7 @@ SSH / Web / Firewall Logs
           ↓
  Detection & Correlation
           ↓
-Severity Classification
+ Severity Classification
           ↓
  MITRE ATT&CK Mapping
           ↓
@@ -203,11 +181,7 @@ Severity Classification
    Real-Time Dashboard
           ↓
    CSV / PDF Reports
-<br>
-How Detection Works
-
-Every incoming event is processed through the rule-based detection engine.
-
+Detection Pipeline
 Incoming Security Event
           ↓
       Parse Event
@@ -227,10 +201,6 @@ Incoming Security Event
  Redis Deduplication
           ↓
    Analyst Dashboard
-
-There is no ML-based detection or black-box classification in the current implementation.
-
-<br>
 Alert Management
 
 Each alert contains security context including:
@@ -241,11 +211,10 @@ MITRE ATT&CK technique
 Event information
 Alert status
 
-Redis-based deduplication prevents repeated events from overwhelming the alert queue during ongoing activity.
+Redis-based deduplication helps prevent repeated events from overwhelming the alert queue during ongoing activity.
 
 Analysts can update alert status according to their assigned permissions.
 
-<br>
 Incident Reporting
 
 Security events and alerts can be exported for investigation and documentation.
@@ -253,18 +222,17 @@ Security events and alerts can be exported for investigation and documentation.
 Supported formats:
 
 CSV
-PDF incident reports
+PDF
 
-These reports provide a persistent representation of security activity for analysis and documentation.
+Reports provide a persistent representation of security activity for analysis and documentation.
 
-<br>
 Architecture
                          ┌─────────────────────────┐
-                         │    React + TypeScript    │
-                         │     Analyst Dashboard    │
+                         │    React + TypeScript   │
+                         │     Analyst Dashboard   │
                          └────────────┬────────────┘
                                       │
-                               REST + WebSocket
+                              REST + WebSocket
                                       │
                          ┌────────────▼────────────┐
                          │     FastAPI Backend     │
@@ -280,10 +248,9 @@ Architecture
                                   │        │
                          ┌────────▼───┐ ┌──▼────────┐
                          │   MySQL    │ │   Redis   │
-                         │ Database   │ │ Dedup /   │
-                         │            │ │ Caching   │
+                         │  Database  │ │ Dedup /   │
+                         │            │ │  Caching  │
                          └────────────┘ └───────────┘
-<br>
 Tech Stack
 Layer	Technologies
 Backend	Python, FastAPI, SQLAlchemy
@@ -295,17 +262,16 @@ Authorization	Role-Based Access Control (RBAC)
 Communication	REST API, WebSockets
 Deployment	Render, Vercel, Aiven
 Containerization	Docker, Docker Compose
-<br>
 Project Structure
 sentinelview/
+│
 ├── backend/
 │   └── app/
 │       ├── api/
-│       │   └── Route handlers
-│       │       ├── Authentication
-│       │       ├── Events
-│       │       ├── Alerts
-│       │       └── Detection Rules
+│       │   ├── Authentication
+│       │   ├── Events
+│       │   ├── Alerts
+│       │   └── Detection Rules
 │       │
 │       ├── core/
 │       │   └── Config, DB session, JWT and RBAC
@@ -314,7 +280,7 @@ sentinelview/
 │       │   └── SQLAlchemy models
 │       │
 │       ├── parsers/
-│       │   └── SSH / web access / firewall log parsers
+│       │   └── SSH / web access / firewall parsers
 │       │
 │       ├── services/
 │       │   └── Correlation, alert and ingestion services
@@ -331,7 +297,6 @@ sentinelview/
 ├── log-shipper-agent/
 ├── docker-compose.yml
 └── docs/
-<br>
 Running Locally
 Prerequisites
 Docker Desktop
@@ -350,10 +315,9 @@ This loads the local demonstration dataset and creates the configured demo accou
 4. Open the Dashboard
 http://localhost:8080
 
-For beginner-friendly setup instructions, see:
+For additional beginner-friendly setup instructions, see:
 
 GETTING_STARTED_SIMPLE.md
-<br>
 Demo Accounts
 
 The demo seed creates accounts for the available RBAC roles:
@@ -363,40 +327,61 @@ Admin	Admin
 Analyst	Analyst
 Viewer	Viewer
 
-Demo credentials should be configured or rotated locally. Never reuse demo credentials for production deployments.
+Configure or rotate demo credentials locally before using the application outside a demonstration environment.
 
-Do not commit real passwords, API keys, JWT secrets, or other sensitive information to the repository.
+Never commit real passwords, API keys, JWT secrets, database credentials, or other sensitive information to the repository.
 
-<br>
-Data Ingestion
+User & Role Management
+Admin Account
 
-SentinelView supports:
+On a fresh deployment, the first person to register becomes the Admin automatically.
 
-File-Based Ingestion
+Subsequent registrations default to the Viewer role.
 
-Security log files can be uploaded and processed through the appropriate parser.
+Registering a User
 
-REST-Based Ingestion
+Open the Swagger documentation:
 
-Security events can also be pushed through the ingestion API.
+https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
 
-The supported log sources are:
+Use:
 
-SSH authentication logs
-Web server access logs
-Firewall / iptables logs
+POST /api/v1/auth/register
 
-Each source is parsed and normalized before entering the detection pipeline.
+Example structure:
 
-<br>
+{
+  "username": "analyst_user",
+  "email": "analyst@example.com",
+  "password": "strong_password",
+  "role": "analyst"
+}
+
+Use your own secure credentials when running the application. Do not publish real credentials in the README.
+
+Changing User Roles
+
+Only an Admin can change another user's role.
+
+Authentication:
+
+POST /api/v1/auth/login
+
+Role management:
+
+PATCH /api/v1/auth/users/{id}
+
+Supported roles:
+
+viewer
+analyst
+admin
 API Reference
 
 Complete API documentation is available through Swagger UI:
 
 https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
-
-Key authentication and administration endpoints include:
-
+Key Endpoints
 Method	Endpoint	Purpose
 POST	/api/v1/auth/register	Register a user
 POST	/api/v1/auth/login	Authenticate and obtain JWT
@@ -414,18 +399,17 @@ Dashboard data
 
 Refer to Swagger for the complete API specification.
 
-<br>
 Security Configuration
 
-Before using SentinelView outside a local demonstration environment:
+Before using SentinelView outside a local demonstration environment, configure secure environment-specific values.
 
 JWT Secret
 
-Change:
+Configure:
 
 JWT_SECRET_KEY
 
-to a strong, randomly generated secret.
+Use a strong, randomly generated secret.
 
 Ingestion API Key
 
@@ -433,13 +417,7 @@ Configure:
 
 INGEST_API_KEY
 
-with a secure value.
-
 The ingestion endpoint uses an API key for machine-to-machine communication from the log-shipper agent.
-
-Application Credentials
-
-Use strong passwords for all application accounts.
 
 Environment Variables
 
@@ -447,15 +425,14 @@ Never commit:
 
 .env
 
-files containing secrets to GitHub.
+files containing secrets.
 
-Environment-specific configuration should be used for:
+Keep the following environment-specific:
 
 Database credentials
 JWT secrets
 Ingestion API keys
 External service credentials
-<br>
 Security & Privacy Considerations
 
 SentinelView demonstrates controlled handling of security data through:
@@ -470,9 +447,8 @@ API-key protected machine-to-machine ingestion
 Centralized security monitoring
 Incident-oriented reporting
 
-The platform is intended as a cybersecurity learning and portfolio project and should undergo additional security hardening before production use.
+The project is intended as a cybersecurity learning and portfolio project. Additional security hardening and deployment controls should be applied before production use.
 
-<br>
 Security Design Principles
 Least-Privilege Access
 
@@ -498,19 +474,17 @@ Security Reporting
 
 Detected activity can be exported for investigation and documentation.
 
-<br>
 Future Scope
 
-The following are potential future extensions and are not currently represented as implemented features:
+The following are planned or potential future extensions and are not currently represented as implemented features:
 
 Data classification capabilities
 Data Loss Prevention (DLP) integrations
 Cloud security log integrations
 Additional threat-intelligence sources
-Machine-learning based anomaly detection
+Machine-learning-based anomaly detection
 Expanded data-governance capabilities
 Additional privacy controls
 Multi-tenant security monitoring
 Advanced sensitive-data discovery
 Extended security analytics
-<br>
