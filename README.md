@@ -7,7 +7,6 @@ SentinelView is a self-hosted SIEM platform designed to centralize security moni
 The platform ingests SSH authentication, web access, and firewall logs, converts them into a unified event schema, evaluates events through configurable MITRE ATT&CK-mapped detection rules, and presents security activity through a real-time analyst dashboard.
 
 <img width="1916" height="906" alt="image" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
-
 ---
 
 ## Overview
@@ -217,8 +216,7 @@ Incident Reporting
 
 Security events and alerts can be exported for investigation and documentation.
 
-Supported formats:
-
+Supported Formats
 CSV
 PDF
 
@@ -251,15 +249,15 @@ Architecture
                          └────────────┘ └───────────┘
 Tech Stack
 Layer	Technologies
-Backend= Python, FastAPI, SQLAlchemy
-Frontend= React, TypeScript, Tailwind CSS, Recharts
-Database= MySQL
-Cache / Deduplication= Redis
-Authentication= JWT
-Authorization = Role-Based Access Control (RBAC)
-Communication = REST API, WebSockets
-Deployment= Render, Vercel, Aiven
-Containerization = Docker, Docker Compose
+Backend	Python, FastAPI, SQLAlchemy
+Frontend	React, TypeScript, Tailwind CSS, Recharts
+Database	MySQL
+Cache / Deduplication	Redis
+Authentication	JWT
+Authorization	Role-Based Access Control (RBAC)
+Communication	REST API, WebSockets
+Deployment	Render, Vercel, Aiven
+Containerization	Docker, Docker Compose
 Project Structure
 sentinelview/
 │
@@ -314,8 +312,10 @@ This loads the local demonstration dataset and creates the configured demo accou
 http://localhost:8080
 
 For additional beginner-friendly setup instructions, see:
+
 GETTING_STARTED_SIMPLE.md
 Demo Accounts
+
 The demo seed creates accounts for the available RBAC roles:
 
 Account	Role
@@ -330,13 +330,18 @@ Never commit real passwords, API keys, JWT secrets, database credentials, or oth
 User & Role Management
 Admin Account
 
-On a fresh deployment, the first person to register becomes the Admin automatically. Subsequent registrations default to the Viewer role.
+On a fresh deployment, the first person to register becomes the Admin automatically.
+
+Subsequent registrations default to the Viewer role.
+
 Registering a User
+
 Open the Swagger documentation:
 
 https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
 
 Use:
+
 POST /api/v1/auth/register
 
 Example structure:
@@ -348,3 +353,48 @@ Example structure:
   "role": "analyst"
 }
 
+Use your own secure credentials when running the application. Do not publish real credentials in the README.
+
+Changing User Roles
+
+Only an Admin can change another user's role.
+
+Authenticate through:
+
+POST /api/v1/auth/login
+
+Role management:
+
+PATCH /api/v1/auth/users/{id}
+
+Supported roles:
+
+viewer
+analyst
+admin
+API Reference
+
+Complete API documentation is available through Swagger UI:
+
+https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
+Key Endpoints
+Method	Endpoint	Purpose
+POST	/api/v1/auth/register	Register a user
+POST	/api/v1/auth/login	Authenticate and obtain JWT
+PATCH	/api/v1/auth/users/{id}	Admin role management
+WS	WebSocket endpoint	Real-time security-event updates
+
+Additional APIs cover:
+
+Security-event ingestion
+Alerts
+Detection rules
+Security logs
+Reporting
+Dashboard data
+
+Refer to Swagger for the complete API specification.
+
+---
+
+**SentinelView — Turning Security Events into Actionable Insights.**
