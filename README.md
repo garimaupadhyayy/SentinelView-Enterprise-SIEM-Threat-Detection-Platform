@@ -249,15 +249,15 @@ Architecture
                          └────────────┘ └───────────┘
 Tech Stack
 Layer	Technologies
-Backend	Python, FastAPI, SQLAlchemy
-Frontend	React, TypeScript, Tailwind CSS, Recharts
-Database	MySQL
-Cache / Deduplication	Redis
-Authentication	JWT
-Authorization	Role-Based Access Control (RBAC)
-Communication	REST API, WebSockets
-Deployment	Render, Vercel, Aiven
-Containerization	Docker, Docker Compose
+Backend= Python, FastAPI, SQLAlchemy
+Frontend= React, TypeScript, Tailwind CSS, Recharts
+Database= MySQL
+Cache / Deduplication= Redis
+Authentication= JWT
+Authorization= Role-Based Access Control (RBAC)
+Communication= REST API, WebSockets
+Deployment= Render, Vercel, Aiven
+Containerization= Docker, Docker Compose
 Project Structure
 sentinelview/
 │
@@ -317,15 +317,12 @@ GETTING_STARTED_SIMPLE.md
 Demo Accounts
 
 The demo seed creates accounts for the available RBAC roles:
-
 Account	Role
 Admin	Admin
 Analyst	Analyst
 Viewer	Viewer
 
 Configure or rotate demo credentials locally before using the application outside a demonstration environment.
-
-Never commit real passwords, API keys, JWT secrets, database credentials, or other sensitive information to the repository.
 
 User & Role Management
 Admin Account
@@ -353,48 +350,4 @@ Example structure:
   "role": "analyst"
 }
 
-Use your own secure credentials when running the application. Do not publish real credentials in the README.
-
-Changing User Roles
-
-Only an Admin can change another user's role.
-
-Authenticate through:
-
-POST /api/v1/auth/login
-
-Role management:
-
-PATCH /api/v1/auth/users/{id}
-
-Supported roles:
-
-viewer
-analyst
-admin
-API Reference
-
-Complete API documentation is available through Swagger UI:
-
-https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs
-Key Endpoints
-Method	Endpoint	Purpose
-POST	/api/v1/auth/register	Register a user
-POST	/api/v1/auth/login	Authenticate and obtain JWT
-PATCH	/api/v1/auth/users/{id}	Admin role management
-WS	WebSocket endpoint	Real-time security-event updates
-
-Additional APIs cover:
-
-Security-event ingestion
-Alerts
-Detection rules
-Security logs
-Reporting
-Dashboard data
-
-Refer to Swagger for the complete API specification.
-
----
-
-**SentinelView — Turning Security Events into Actionable Insights.**
+SentinelView — Turning Security Events into Actionable Insights.
