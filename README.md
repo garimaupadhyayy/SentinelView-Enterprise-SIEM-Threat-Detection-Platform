@@ -1,14 +1,22 @@
 # SentinelView 🛡️
 
-**Enterprise Security Information and Event Management (SIEM)**
+## Enterprise Security Information and Event Management (SIEM)
 
-A self-hosted log aggregation and threat correlation platform. SentinelView
-ingests security logs (SSH auth, web access, firewall), normalizes them into
-a unified schema, evaluates them against a rule-based correlation engine
-mapped to MITRE ATT&CK, and surfaces the results on a live analyst dashboard.
+SentinelView is a self-hosted SIEM platform designed to centralize security monitoring, normalize heterogeneous security logs, detect threats, protect sensitive information, and support analyst-driven incident investigation. The platform ingests SSH authentication, web access, and firewall logs, converts them into a unified event schema, evaluates them through configurable MITRE ATT&CK-mapped detection rules, and presents security events through a real-time analyst dashboard.
 
 <img width="1916" height="906" alt="image" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
 
+## Key Highlights
+
+- **3 security log sources** normalized into a unified event schema
+- **5 MITRE ATT&CK-mapped detection rules** for threat identification
+- **PII masking** using regex and Luhn validation before storage
+- JWT-based **Role-Based Access Control (RBAC)**
+- Redis-based alert deduplication for reduced alert noise
+- Real-time security monitoring through WebSockets
+- CSV and PDF incident reporting
+
+<img width="1916" height="906" alt="SentinelView Dashboard" src="https://github.com/user-attachments/assets/ccb9ac58-1d76-4930-a0d2-16b37fb8b0c8" />
 
 ## Live Deployment
 
@@ -17,112 +25,60 @@ mapped to MITRE ATT&CK, and surfaces the results on a live analyst dashboard.
 | **Dashboard** | `https://sentinelview-console.vercel.app/` |
 | **API Docs (Swagger UI)** | `https://sentinelview-enterprise-siem-threat-m3sx.onrender.com/docs` |
 
+## Core Features
 
-## Accessing the Platform
+### Centralized Security Monitoring
 
-### For the project owner (Admin)
+- Ingests SSH authentication, web access, and firewall/iptables logs.
+- Normalizes different log formats into a unified event schema.
+- Supports file upload and REST-based log ingestion.
 
-The Admin account is created automatically — **the first person to ever
-register on a fresh deployment becomes Admin.** All subsequent registrations
-default to Viewer.
+### Threat Detection & Correlation
 
-### For anyone else you want to give access (Viewer / Analyst)
+- Uses a configurable rule-based detection engine.
+- Implements **5 MITRE ATT&CK-mapped detection rules**.
+- Assigns severity to detected events.
+- Deduplicates repeated alerts using Redis.
 
-There is no self-serve "sign up" button on the login page by design (SIEM
-tools are internal security software, not public products). To grant
-someone access:
+### Sensitive Data Protection
 
-1. Go to the API docs: `<backend-url>/docs`
-2. Expand **POST `/api/v1/auth/register`**
-3. Click **"Try it out"**
-4. Fill in the request body:
-   ```json
-   {
-     "username": "their_username",
-     "email": "their_email@example.com",
-     "password": "a_strong_password",
-     "role": "viewer"
-   }
-   ```
-5. Click **Execute** — a `201` response confirms the account was created
-6. Share the username and password with them directly (outside this system)
+- Detects and masks **PII** before storage.
+- Uses regex-based detection and Luhn validation for applicable identifiers.
+- Reduces exposure of sensitive information within security logs.
 
-They can then log in at the frontend URL's `/login` page.
+### Access Control
 
-**Role reference:**
+- Uses JWT authentication with **Role-Based Access Control (RBAC)**.
+- Supports Viewer, Analyst, and Admin roles.
+- Restricts administrative operations based on user role.
 
-| Role | Can view dashboard, alerts, logs | Can change alert status | Can manage detection rules | Can manage users |
-|---|---|---|---|---|
-| Viewer | Yes | No | No | No |
-| Analyst | Yes | Yes | No | No |
-| Admin | Yes | Yes | Yes | Yes |
+### Security Dashboard & Reporting
 
-Only an **Admin** can promote a Viewer/Analyst to a different role — this is
-done via the `PATCH /api/v1/auth/users/{id}` endpoint in the same API docs
-page (Admin's own login token required, obtained by logging in through
-`/auth/login` in the same docs page first).
+- Real-time event and alert monitoring.
+- MITRE ATT&CK coverage visualization.
+- Event volume and source IP analysis.
+- CSV and PDF incident reporting.
 
+## Detection Workflow
 
-## What It Does
-
-1. **Ingests** logs via file upload or a REST push endpoint, using
-   dedicated parsers for SSH auth logs, web server access logs, and
-   firewall/iptables logs — each normalized into one unified event schema.
-2. **Correlates** every incoming event against a set of configurable,
-   database-stored detection rules (brute-force login, port scanning,
-   impossible travel, privilege escalation, web attack signatures).
-3. **Alerts**, with each one mapped to a real MITRE ATT&CK technique ID,
-   scored by severity, and deduplicated via Redis so a single ongoing
-   attack doesn't flood the queue with duplicate alerts.
-4. **Displays** everything on a live dashboard: event volume over time,
-   geo-distribution of source IPs, MITRE ATT&CK coverage heatmap, and a
-   real-time event tail over WebSocket.
-5. **Reports**, exporting any alert or time range as a CSV or formatted
-   PDF incident report.
-
-## Tech Stack
-
-- **Backend:** Python, FastAPI, SQLAlchemy
-- **Frontend:** React, TypeScript, Tailwind CSS, Recharts
-- **Database:** MySQL (hosted on Aiven)
-- **Cache / dedup:** Redis
-- **Auth:** JWT with role-based access control (RBAC)
-- **Deployment:** Render (backend + Redis), Vercel (frontend), Aiven (MySQL)
-- **Containerization:** Docker + Docker Compose (for local development)
-  
-## Project Structure
-
-```
-sentinelview/
-├── backend/                 FastAPI application
-│   └── app/
-│       ├── api/             Route handlers (auth, events, alerts, rules, ...)
-│       ├── core/            Config, DB session, security/JWT, RBAC
-│       ├── models/          SQLAlchemy models
-│       ├── parsers/         SSH / web access / firewall log parsers
-│       ├── services/        Correlation engine, alert service, ingestion
-│       └── ws/               WebSocket connection manager
-│
-├── frontend/                 React + TypeScript dashboard
-│   └── src/
-│       ├── pages/            One file per screen
-│       ├── components/       Reusable UI pieces
-│       └── api/               Backend API client
-│
-├── log-shipper-agent/         Lightweight agent for streaming real server logs
-├── docker-compose.yml         One-command local deployment
-└── docs/                       Additional documentation
-```
-
-## Running Locally
-
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
-```bash
-git clone <this-repo>
-cd sentinelview
-docker compose up --build -d
-docker compose --profile demo run --rm seed   # loads demo data
+```text
+SSH / Web / Firewall Logs
+          ↓
+     Log Ingestion
+          ↓
+   Unified Normalization
+          ↓
+      PII Masking
+          ↓
+ Detection & Correlation
+          ↓
+ MITRE ATT&CK Mapping
+          ↓
+ Redis Alert Deduplication
+          ↓
+   Real-Time Dashboard
+          ↓
+ CSV / PDF Incident Reports
 ```
 
 Open **http://localhost:8080**. Demo accounts created by the seed script
