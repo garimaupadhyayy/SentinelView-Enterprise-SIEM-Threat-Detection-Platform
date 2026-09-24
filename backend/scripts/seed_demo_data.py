@@ -174,6 +174,16 @@ def main():
     service.ingest_events(web_events, source_name="seed-web")
     service.ingest_events(fw_events, source_name="seed-firewall")
 
+    from app.schemas.event import NormalizedEventIn
+    from app.models.event import SourceType
+    synthetic_event = NormalizedEventIn(
+        timestamp=now,
+        event_type="pii_test",
+        raw_message="Email bob@example.com Phone 9876543210 Aadhaar 234567890124 PAN ABCDE1234F Card 4242 4242 4242 4242",
+        source_type=SourceType.GENERIC
+    )
+    service.ingest_events([synthetic_event], source_name="synthetic-pii")
+
     from app.models.alert import Alert
     from app.models.event import Event
 

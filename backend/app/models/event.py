@@ -15,6 +15,13 @@ class Severity(str, enum.Enum):
     CRITICAL = "critical"
 
 
+class Classification(str, enum.Enum):
+    PUBLIC = "Public"
+    INTERNAL = "Internal"
+    CONFIDENTIAL = "Confidential"
+    RESTRICTED = "Restricted"
+
+
 class SourceType(str, enum.Enum):
     SSH_AUTH = "ssh_auth"
     WEB_ACCESS = "web_access"
@@ -44,6 +51,7 @@ class Event(Base):
     source_type: Mapped[SourceType] = mapped_column(Enum(SourceType), nullable=False)
     user: Mapped[str | None] = mapped_column(String(128), nullable=True)
     status_code: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    classification: Mapped[Classification] = mapped_column(Enum(Classification), default=Classification.PUBLIC, nullable=False)
 
     # extra structured fields useful for detection rules without over-normalizing
     port: Mapped[int | None] = mapped_column(Integer, nullable=True)

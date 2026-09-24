@@ -24,8 +24,15 @@ class IngestionService:
     def ingest_events(
         self, events: list[NormalizedEventIn], source_name: str = "unknown"
     ) -> list[Event]:
+        from app.services.pii_service import PIIDetector
+
         db_events: list[Event] = []
         for e in events:
+            # PII Masking and Classification
+            masked_msg, classification = PIIDetector.process_text(e.raw_message)
+            e.raw_message = masked_msg
+            e.classification = classification
+            
             db_event = Event(**e.model_dump())
             self.db.add(db_event)
             db_events.append(db_event)
